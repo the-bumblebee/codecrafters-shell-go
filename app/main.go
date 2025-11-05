@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -52,7 +54,26 @@ func main() {
 		case "echo":
 			fmt.Println(strings.Join(args[1:], " "))
 		default:
-			fmt.Println(args[0] + ": command not found")
+			flag := false
+			for _, dir := range pathDirs {
+				file := filepath.Join(dir, args[0])
+				info, err := os.Stat(file)
+				if err == nil && info.Mode()&0111 != 0 {
+					flag = true
+					cmd := exec.Command(strings.Join(args, " "))
+					var out bytes.Buffer
+					cmd.Stdout = &out
+					err := cmd.Run()
+					if err != nil {
+						fmt.Fprintln(os.Stderr, "Command execution failed: ", err)
+					}
+					fmt.Println(out.String())
+					break
+				}
+			}
+			if !flag {
+				fmt.Println(args[0] + ": command not found")
+			}
 		}
 	}
 }
