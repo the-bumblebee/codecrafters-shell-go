@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -16,26 +17,41 @@ func main() {
 	// TODO: Uncomment the code below to pass the first stage
 	for {
 		commands := []string{"echo", "exit", "type"}
+		pathDirs := strings.Split(os.Getenv("PATH"), ":")
 		fmt.Fprint(os.Stdout, "$ ")
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
 		if err != nil {
-			return
+			fmt.Fprintln(os.Stderr, "Error reading input:", err)
+			os.Exit(1)
 		}
 		command = strings.TrimSpace(command)
 		args := strings.Split(command, " ")
-		if args[0] == "exit" {
+		switch args[0] {
+		case "exit":
 			os.Exit(0)
-		} else if args[0] == "echo" {
-			fmt.Println(strings.Join(args[1:], " "))
-		} else if args[0] == "type" {
+		case "type":
 			if len(args) < 2 {
 				fmt.Println("Usage: type <command>")
 			} else if slices.Contains(commands, args[1]) {
 				fmt.Println(args[1] + " is a shell builtin")
 			} else {
-				fmt.Println(args[1] + ": not found")
+				flag := false
+				for _, dir := range pathDirs {
+					file := filepath.Join(dir, args[1])
+					info, err := os.Stat(file)
+					if err == nil && info.Mode()&0111 != 0 {
+						fmt.Println(args[1] + " is " + file)
+						flag = true
+						break
+					}
+				}
+				if !flag {
+					fmt.Println(args[1] + ": not found")
+				}
 			}
-		} else {
+		case "echo":
+			fmt.Println(strings.Join(args[1:], " "))
+		default:
 			fmt.Println(args[0] + ": command not found")
 		}
 	}
