@@ -60,14 +60,15 @@ func main() {
 				info, err := os.Stat(file)
 				if err == nil && info.Mode()&0111 != 0 {
 					flag = true
-					cmd := exec.Command(strings.Join(args, " "))
+					cmd := exec.Command(args[0], args[1:]...)
 					var out bytes.Buffer
 					cmd.Stdout = &out
 					err := cmd.Run()
 					if err != nil {
 						fmt.Fprintln(os.Stderr, "Command execution failed: ", err)
+						break
 					}
-					fmt.Println(out.String())
+					fmt.Print(out.String())
 					break
 				}
 			}
