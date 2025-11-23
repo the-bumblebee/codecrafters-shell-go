@@ -11,12 +11,7 @@ import (
 	"strings"
 )
 
-// Ensures gofmt doesn't remove the "fmt" and "os" imports in stage 1 (feel free to remove this!)
-var _ = fmt.Fprint
-var _ = os.Stdout
-
 func main() {
-	// TODO: Uncomment the code below to pass the first stage
 	for {
 		commands := []string{"echo", "exit", "type"}
 		pathDirs := strings.Split(os.Getenv("PATH"), ":")
@@ -29,6 +24,9 @@ func main() {
 		command = strings.TrimSpace(command)
 		args := strings.Split(command, " ")
 		switch args[0] {
+		case "pwd":
+			pwd := os.Getenv("PWD")
+			fmt.Println(pwd)
 		case "exit":
 			os.Exit(0)
 		case "type":
