@@ -13,7 +13,7 @@ import (
 
 func main() {
 	for {
-		commands := []string{"echo", "exit", "type", "pwd"}
+		commands := []string{"echo", "exit", "type", "pwd", "cd"}
 		pathDirs := strings.Split(os.Getenv("PATH"), ":")
 		fmt.Fprint(os.Stdout, "$ ")
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -24,6 +24,16 @@ func main() {
 		command = strings.TrimSpace(command)
 		args := strings.Split(command, " ")
 		switch args[0] {
+		case "cd":
+			if len(args) < 2 {
+				fmt.Println("Usage: cd <directory>")
+			} else {
+				path := args[1]
+				err := os.Chdir(path)
+				if err != nil {
+					fmt.Println("cd: " + args[1] + ": No such file or directory")
+				}
+			}
 		case "pwd":
 			pwd := os.Getenv("PWD")
 			fmt.Println(pwd)
