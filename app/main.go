@@ -13,7 +13,7 @@ import (
 
 func main() {
 	for {
-		commands := []string{"echo", "exit", "type"}
+		commands := []string{"echo", "exit", "type", "pwd"}
 		pathDirs := strings.Split(os.Getenv("PATH"), ":")
 		fmt.Fprint(os.Stdout, "$ ")
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
